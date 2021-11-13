@@ -9,11 +9,16 @@ window = None
 fps = 30
 bg = pg.Color(0, 120, 0)
 
+class cards():
+
+a_spade = pg.image.load("cards/a_spade.png")
+
 # PyGame initialization
 pg.init()
 timer = pg.time.Clock()
 window = pg.display.set_mode((screen_width, screen_height))
 pg.display.set_caption("HackED Beta Blackjack 404")
+
 
 # Game Loop
 finish = False
