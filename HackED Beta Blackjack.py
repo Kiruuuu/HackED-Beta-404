@@ -106,8 +106,8 @@ def play():
 	hit_button = button((0,255,0), 0, 475, 225, 100,'HIT')
 	stand_button = button((0,255,0), 225, 475, 225, 100,'STAND')
 	quit_button = button((0,255,0), 975, 475, 225, 100, 'QUIT')
-	bust_button = button((0,255,0), 400, 350, 400, 100, 'LOSE! RETRY?')
-	win_button = button((0,255,0), 400, 350, 400, 100, 'WIN! REPLAY?')
+	bust_button = button((0,255,0), 400, 350, 400, 100, 'BUST! RETRY?')
+
 	# Game Loop
 	hit_list = [False] * 3 # haha hitlist
 	finish = False
@@ -115,9 +115,7 @@ def play():
 	hit_num = 0
 	bust = False
 	p_score = 0
-	d_score = 0
-	d_stand = 0
-	win = False
+
 	if card_val[0] == card_val[1] == 'a':
 		p_score = 12
 	elif card_val[0] == 'a':
@@ -126,18 +124,8 @@ def play():
 		p_score = 11 + card_val[0]
 	else:
 		p_score = card_val[0] + card_val[1]
-	
-	if card_val[2] == card_val[3] == 'a':
-		d_score = 12
-	elif card_val[2] == 'a':
-		d_score = 11 + card_val[3]
-	elif card_val[3] == 'a':
-		d_score = 11 + card_val[2]
-	else:
-		d_score = card_val[2] + card_val[3]
 
 	while finish == False:
-
 		window.fill(bg)
 		hit_button.draw(window, (0,0,0))
 		stand_button.draw(window, (0,0,0))
@@ -173,32 +161,11 @@ def play():
 					elif stand_button.over(pos):
 						stand = True
 						window.blit(img_call_list[2], (975,0))
-						while d_score < 17:
-							if card_val[7+d_stand] == 'a':
-								d_score += 11
-								if d_score > 21:
-									d_score -= 10
-									if d_score > 21:
-										win == True
-							else:
-								d_score += card_val[7 + d_stand]
-							if (card_val[2] or card_val[3]) == 'a':
-								if d_score > 21:
-									d_score -= 10
-							elif d_score > 21:
-								win = True
-							d_stand += 1
 
 					elif quit_button.over(pos):
 						finish = True
 					elif (hit_num == 3) or stand:
 						hit_button.color = (128,128,128)
-
-					if p_score > d_score:
-						win = True
-					elif d_score < p_score:
-						bust = True
-					print(bust)
 
 				if event.type == pg.MOUSEMOTION:
 					if hit_button.over(pos) and (stand is False) and (hit_num != 3):
@@ -220,7 +187,7 @@ def play():
 					else:
 						quit_button.color = (0,255,0)
 
-			while bust is True:
+			if bust is True:
 				hit_button.color = (128,128,128)
 				stand_button.color = (128,128,128)
 				pos = pg.mouse.get_pos()
@@ -252,29 +219,6 @@ def play():
 			
 			pg.display.update()
 			timer.tick(fps)
-			
-			if win is True:
-				win_button.draw(window, (0,0,0))
-				hit_button.color = (128,128,128)
-				stand_button.color = (128,128,128)
-				pos = pg.mouse.get_pos()
-				
-				if event.type == pg.MOUSEBUTTONDOWN:
-					if quit_button.over(pos):
-						finish = True
-					if win_button.over(pos):
-						play()
-
-				if event.type == pg.MOUSEMOTION:
-					if quit_button.over(pos):
-						quit_button.color = (255,0,0)
-					else: 
-						quit_button.color = (0,255,0)
-
-					if win_button.over(pos):
-						win_button.color = (255,0,0)
-					else:
-						win_button.color = (0,255,0)
 
 	pg.display.quit()
 	pg.quit()
