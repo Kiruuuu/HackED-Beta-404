@@ -91,6 +91,8 @@ while finish == False:
 	
 	window.blit(p_card1_img, (0,575))
 	window.blit(p_card2_img, (225,575))
+	window.blit(d_card1_img, (750,0))
+	window.blit(d_card2_img, (525,0))
 	pg.display.update()
 	timer.tick(fps)
-
+    
