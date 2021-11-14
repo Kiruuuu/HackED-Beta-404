@@ -10,16 +10,12 @@ window = None
 fps = 30
 bg = pg.Color(0, 120, 0)
 
-
-
 # creating list of all cards
 suits = ["club", "dia", "heart", "spade"]
 royalty = ["j", "q", "k"]
 cards = []
+img_call_list = []
 
-#filetype = ".png"
-
-img = []
 
 for suit in suits:
 	ace_card = "a" + "_" + suit
@@ -31,46 +27,68 @@ for suit in suits:
 		card = str(royal) + "_" + suit
 		cards.append(card)
 
+class button():
+	def __init__(self, color, x,y,width,height, text=''):
+		self.color = color
+		self.x = x
+		self.y = y
+		self.width = width
+		self.height = height
+		self.text = text
+
+	def draw(self,win,outline=None):
+		#Call this method to draw the button on the screen
+		if outline:
+			pg.draw.rect(win, outline, (self.x-2,self.y-2,self.width+4,self.height+4),0)
+
+		pg.draw.rect(win, self.color, (self.x,self.y,self.width,self.height),0)
+
+		if self.text != '':
+			font = pg.font.SysFont('comicsans', 60)
+			text = font.render(self.text, 1, (0,0,0))
+			win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
+
+	def over(self,pos):
+		#Pos is the mouse position or a tuple of (x,y) coordinates
+		if pos[0] > self.x and pos[0] < self.x + self.width:
+			if pos[1] > self.y and pos[1] < self.y + self.height:
+				return True
+
+		return False
 
 def card_deal():
-	p_card1 = None
-	p_card2 = None
-	d_card1 = None
-	d_card2 = None
-	while (p_card1 == p_card2) or (p_card1 == d_card1) or\
-		(p_card1 == d_card2) or (p_card2 == d_card1) or\
-		(p_card2 == d_card2) or (d_card1 == d_card2):
-		p_card1 = rnd.randint(0,51)
-		p_card2 = rnd.randint(0,51)
-		d_card1 = rnd.randint(0,51)
-		d_card2 = rnd.randint(0,51)
-	return [p_card1, p_card2, d_card1, d_card2]
+	dealt_cards = [None] * 14
+	loop_cond = True
+	while loop_cond:
+		for card in range(len(dealt_cards)):
+			dealt_cards[card] = rnd.randint(0,51)
+			for i in range(52):
+				if dealt_cards.count(i) > 1:
+					loop_cond = True
+					break
+				else:
+					loop_cond = False
+
+
+	return dealt_cards
 
 
 def card_img():
 	dealt_cards = card_deal()
 	print(dealt_cards)
 	# Changing from card index values to actual cards
-	dealt_cards[0] = cards[dealt_cards[0]]
-	dealt_cards[1] = cards[dealt_cards[1]]
-	dealt_cards[2] = cards[dealt_cards[2]]
-	dealt_cards[3] = cards[dealt_cards[3]]
+
 
 	for card in range(len(dealt_cards)):
-		img.append("cards/" + dealt_cards[card] + ".png")
-	p_card1_img_call = img[0]
-	p_card2_img_call = img[1]
-	d_card1_img_call = img[2]
-	d_card2_img_call = img[3]
+		dealt_cards[card] = cards[dealt_cards[card]]
+		img_call_list.append("cards/" + dealt_cards[card] + ".png")
+		img_call_list[card] = pg.image.load(img_call_list[card])
 
-	p_card1_img = pg.image.load(p_card1_img_call)
-	p_card2_img = pg.image.load(p_card2_img_call)
-	d_card1_img = pg.image.load(d_card1_img_call)
-	d_card2_img = pg.image.load(d_card2_img_call)
+	print(img_call_list)
 
-	return p_card1_img, p_card2_img, d_card1_img, d_card2_img
+	return img_call_list
 
-p_card1_img, p_card2_img, d_card1_img, d_card2_img = card_img()
+img_call_list = card_img()
 
 # PyGame initialization
 pg.init()
@@ -78,21 +96,30 @@ timer = pg.time.Clock()
 window = pg.display.set_mode((screen_width, screen_height))
 pg.display.set_caption("HackED Beta Blackjack 404")
 
-
-
-
+hit_button = button((0,255,0), 0, 0, 250, 100,'HIT')
 # Game Loop
 finish = False
 while finish == False:
 	window.fill(bg)
+	hit_button.draw(window, (0,0,0))
 	for event in pg.event.get():
+		pos = pg.mouse.get_pos()
 		if event.type == QUIT:
 			finish = True
+		if event.type == pg.MOUSEBUTTONDOWN:
+			if hit_button.over(pos):
+				continue
+		if event.type == pg.MOUSEMOTION:
+			if hit_button.over(pos):
+				hit_button.color = (255,0,0)
+			else:
+				hit_button.color = (0,255,0)
+
 	
-	window.blit(p_card1_img, (0,575))
-	window.blit(p_card2_img, (225,575))
-	window.blit(d_card1_img, (750,0))
-	window.blit(d_card2_img, (525,0))
+	window.blit(img_call_list[0], (0,575))
+	window.blit(img_call_list[1], (225,575))
+	window.blit(img_call_list[2], (975,0))
+	window.blit(img_call_list[3], (750,0))
 	pg.display.update()
 	timer.tick(fps)
     
